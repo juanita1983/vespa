@@ -219,9 +219,6 @@ public class DeploymentSpec {
     }
 
     // TODO: Remove after November 2019
-    public Notifications notifications() { return singleInstance().notifications(); }
-
-    // TODO: Remove after November 2019
     public List<Endpoint> endpoints() { return singleInstance().endpoints(); }
 
     /** Returns the XML form of this spec, or null if it was not created by fromXml, nor is empty */
