@@ -387,16 +387,14 @@ public class DeploymentSpecWithoutInstanceTest {
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
         assertEquals("domain", spec.athenzDomain().get().value());
-        assertEquals("prod-service", spec.athenzService(InstanceName.from("default"),
-                                                                 Environment.prod,
-                                                                 RegionName.from("us-central-1")).get().value());
-        assertEquals("prod-service", spec.athenzService(InstanceName.from("default"),
-                                                                 Environment.prod,
-                                                                 RegionName.from("us-west-1")).get().value());
-        assertEquals("prod-service", spec.athenzService(InstanceName.from("default"),
-                                                                 Environment.prod,
-                                                                 RegionName.from("us-east-3")).get().value());
-        assertEquals("domain", spec.athenzDomain().get().value());
+        assertEquals("domain", spec.requireInstance("default").athenzDomain().get().value());
+        assertEquals("service", spec.athenzService().get().value());
+        assertEquals("prod-service", spec.requireInstance("default").athenzService(Environment.prod, RegionName.from("us-central-1"))
+                                         .get().value());
+        assertEquals("prod-service", spec.requireInstance("default").athenzService(Environment.prod, RegionName.from("us-west-1"))
+                                         .get().value());
+        assertEquals("prod-service", spec.requireInstance("default").athenzService(Environment.prod, RegionName.from("us-east-3"))
+                                         .get().value());
     }
 
     @Test
@@ -410,6 +408,7 @@ public class DeploymentSpecWithoutInstanceTest {
                 "</deployment>"
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
+        assertEquals("service", spec.athenzService().get().value());
         assertEquals(spec.requireInstance("default").athenzDomain().get().value(), "domain");
         assertEquals(spec.requireInstance("default").athenzService(Environment.prod, RegionName.from("us-west-1")).get().value(), "prod-service");
     }

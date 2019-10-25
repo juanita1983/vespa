@@ -670,15 +670,10 @@ public class DeploymentSpecTest {
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
         assertEquals("domain", spec.athenzDomain().get().value());
-        assertEquals("service", spec.athenzService(InstanceName.from("instance1"),
-                                                            Environment.prod,
-                                                            RegionName.from("us-west-1")).get().value());
-        assertEquals("service", spec.athenzService(InstanceName.from("non-existent"),
-                                                   Environment.prod,
-                                                   RegionName.from("us-west-1")).get().value());
         assertEquals("domain", spec.requireInstance("instance1").athenzDomain().get().value());
+        assertEquals("service", spec.athenzService().get().value());
         assertEquals("service", spec.requireInstance("instance1").athenzService(Environment.prod,
-                                                                                         RegionName.from("us-west-1")).get().value());
+                                                                                RegionName.from("us-west-1")).get().value());
     }
 
     @Test
@@ -698,19 +693,15 @@ public class DeploymentSpecTest {
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
         assertEquals("domain", spec.athenzDomain().get().value());
-        assertEquals("prod-service", spec.athenzService(InstanceName.from("instance1"),
-                                                                 Environment.prod,
-                                                                 RegionName.from("us-west-1")).get().value());
-        assertEquals("service", spec.athenzService(InstanceName.from("non-existent"),
-                                                            Environment.prod,
-                                                            RegionName.from("us-west-1")).get().value());
+        assertEquals("service", spec.athenzService().get().value());
+
         assertEquals("domain", spec.requireInstance("instance1").athenzDomain().get().value());
         assertEquals("prod-service", spec.requireInstance("instance1").athenzService(Environment.prod,
-                                                                                                     RegionName.from("us-central-1")).get().value());
+                                                                                     RegionName.from("us-central-1")).get().value());
         assertEquals("prod-service", spec.requireInstance("instance1").athenzService(Environment.prod,
-                                                                                                     RegionName.from("us-west-1")).get().value());
+                                                                                     RegionName.from("us-west-1")).get().value());
         assertEquals("prod-service", spec.requireInstance("instance1").athenzService(Environment.prod,
-                                                                                                     RegionName.from("us-east-3")).get().value());
+                                                                                     RegionName.from("us-east-3")).get().value());
     }
 
     @Test
@@ -739,12 +730,6 @@ public class DeploymentSpecTest {
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
         assertEquals("domain", spec.athenzDomain().get().value());
-        assertEquals("service", spec.athenzService(InstanceName.from("instance1"),
-                                                   Environment.prod,
-                                                   RegionName.from("us-west-1")).get().value());
-        assertEquals("service", spec.athenzService(InstanceName.from("non-existent"),
-                                                   Environment.prod,
-                                                   RegionName.from("us-west-1")).get().value());
         assertEquals("domain", spec.requireInstance("instance1").athenzDomain().get().value());
         assertEquals("service", spec.requireInstance("instance1").athenzService(Environment.prod,
                                                                                 RegionName.from("us-west-1")).get().value());
@@ -766,11 +751,10 @@ public class DeploymentSpecTest {
                 "</deployment>"
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
+        assertEquals(Optional.empty(), spec.athenzDomain());
+        assertEquals(Optional.empty(), spec.athenzService());
         assertEquals(spec.requireInstance("default").athenzDomain().get().value(), "domain");
         assertEquals(spec.requireInstance("default").athenzService(Environment.prod, RegionName.from("us-west-1")).get().value(), "service");
-        assertEquals(Optional.empty(), spec.athenzService(InstanceName.from("non-existent"),
-                                                          Environment.prod,
-                                                          RegionName.from("us-west-1")));
     }
 
     @Test
@@ -787,17 +771,9 @@ public class DeploymentSpecTest {
         );
         DeploymentSpec spec = DeploymentSpec.fromXml(r);
         assertEquals(spec.requireInstance("default").athenzDomain().get().value(), "domain");
-        assertEquals(spec.athenzService(InstanceName.from("default"),
-                                        Environment.prod,
-                                        RegionName.from("us-west-1")).get().value(),
-                     "prod-service");
-        assertEquals(spec.requireInstance("default").athenzService(Environment.prod,
-                                                                   RegionName.from("us-west-1")).get().value(),
-                     "prod-service");
-        assertEquals(spec.athenzService(InstanceName.from("non-existent"),
-                                        Environment.prod,
-                                        RegionName.from("us-west-1")).get().value(),
-                     "service");
+        assertEquals("prod-service",
+                     spec.requireInstance("default").athenzService(Environment.prod,
+                                                                   RegionName.from("us-west-1")).get().value());
     }
 
     @Test(expected = IllegalArgumentException.class)
