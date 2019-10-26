@@ -70,7 +70,7 @@ public class Deconstructor implements ComponentDeconstructor {
         }
 
         /**
-        * Returns a random delay betweeen 0 and 10 minutes which will be different across identical containers invoking this at the same time.
+        * Returns a random delay between 0 and 10 minutes which will be different across identical containers invoking this at the same time.
         * Used to randomize restart to avoid simultaneous cluster restarts.
         */
         private Duration getRandomizedShutdownDelay() {
