@@ -14,7 +14,10 @@ import org.junit.Before;
 import org.osgi.framework.Bundle;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+
+import static java.util.Collections.emptyList;
 
 /**
  * @author Tony Vaagenes
@@ -60,7 +63,8 @@ public class ContainerTestBase {
                         }
 
                         @Override
-                        public void useBundles(Collection<FileReference> bundles) {
+                        public List<Bundle> useBundles(Collection<FileReference> bundles) {
+                            return emptyList();
                         }
 
                         @Override

@@ -102,11 +102,12 @@ public class HandlersConfigurerTestWrapper {
     }
 
     private ComponentDeconstructor getTestDeconstructor() {
-        return components -> components.forEach(component -> {
+        return (components, bundles) -> components.forEach(component -> {
             if (component instanceof AbstractComponent) {
                 AbstractComponent abstractComponent = (AbstractComponent) component;
                 if (abstractComponent.isDeconstructable()) abstractComponent.deconstruct();
             }
+            if (! bundles.isEmpty()) throw new IllegalArgumentException("This test should not use bundles");
         });
     }
 

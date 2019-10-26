@@ -30,6 +30,7 @@ import org.osgi.framework.wiring.BundleWiring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -121,7 +122,7 @@ public class HandlersConfigurerDi {
         }
 
         @Override
-        public void useBundles(Collection<FileReference> bundles) {
+        public List<Bundle> useBundles(Collection<FileReference> bundles) {
             log.info("Installing bundles from the latest application");
 
             int bundlesRemovedOrInstalled = bundleLoader.use(new ArrayList<>(bundles));

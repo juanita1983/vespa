@@ -21,8 +21,10 @@ import com.yahoo.vespa.config.ConfigKey;
 import org.osgi.framework.Bundle;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -48,7 +50,6 @@ public class Container {
     private ConfigRetriever configurer;
     private long previousConfigGeneration = -1L;
     private long leastGeneration = -1L;
-    private Set<Bundle> obsoleteBundles;
 
     public Container(SubscriberFactory subscriberFactory, String configId, ComponentDeconstructor componentDeconstructor, Osgi osgi) {
         this.subscriberFactory = subscriberFactory;
@@ -79,8 +80,8 @@ public class Container {
 
     public ComponentGraph getNewComponentGraph(ComponentGraph oldGraph, Injector fallbackInjector, boolean restartOnRedeploy) {
         try {
-            obsoleteBundles = new HashSet<>();
-            ComponentGraph newGraph = getConfigAndCreateGraph(oldGraph, fallbackInjector, restartOnRedeploy);
+            Collection<Bundle> obsoleteBundles = new HashSet<>();
+            ComponentGraph newGraph = getConfigAndCreateGraph(oldGraph, fallbackInjector, restartOnRedeploy, obsoleteBundles);
             newGraph.reuseNodes(oldGraph);
             constructComponents(newGraph);
             deconstructObsoleteComponents(oldGraph, newGraph, obsoleteBundles);
@@ -128,7 +129,11 @@ public class Container {
         }
     }
 
-    private ComponentGraph getConfigAndCreateGraph(ComponentGraph graph, Injector fallbackInjector, boolean restartOnRedeploy) {
+    private ComponentGraph getConfigAndCreateGraph(ComponentGraph graph,
+                                                   Injector fallbackInjector,
+                                                   boolean restartOnRedeploy,
+                                                   Collection<Bundle> obsoleteBundles) // NOTE: Return value
+    {
         ConfigSnapshot snapshot;
 
         while (true) {
@@ -149,8 +154,8 @@ public class Container {
                                         + "previous generation: %d\n",
                                 getBootstrapGeneration(), getComponentsGeneration(), previousConfigGeneration));
 
-
-                obsoleteBundles.addAll(installBundles(snapshot.configs()));
+                Collection<Bundle> bundlesToRemove = installBundles(snapshot.configs());
+                obsoleteBundles.addAll(bundlesToRemove);
 
                 graph = createComponentsGraph(snapshot.configs(), getBootstrapGeneration(), fallbackInjector);
 
@@ -194,9 +199,9 @@ public class Container {
         }
     }
 
-    private void installBundles(Map<ConfigKey<? extends ConfigInstance>, ConfigInstance> configsIncludingBootstrapConfigs) {
+    private List<Bundle> installBundles(Map<ConfigKey<? extends ConfigInstance>, ConfigInstance> configsIncludingBootstrapConfigs) {
         BundlesConfig bundlesConfig = getConfig(bundlesConfigKey, configsIncludingBootstrapConfigs);
-        osgi.useBundles(bundlesConfig.bundle());
+        return osgi.useBundles(bundlesConfig.bundle());
     }
 
     private ComponentGraph createComponentsGraph(Map<ConfigKey<? extends ConfigInstance>, ConfigInstance> configsIncludingBootstrapConfigs,
@@ -254,7 +259,8 @@ public class Container {
     }
 
     private void deconstructAllComponents(ComponentGraph graph, ComponentDeconstructor deconstructor) {
-        deconstructor.deconstruct(graph.allConstructedComponentsAndProviders());
+        // This is only used for shutdown, so no need to uninstall any bundles.
+        deconstructor.deconstruct(graph.allConstructedComponentsAndProviders(), Collections.emptyList());
     }
 
     public static <T extends ConfigInstance> T getConfig(ConfigKey<T> key,
