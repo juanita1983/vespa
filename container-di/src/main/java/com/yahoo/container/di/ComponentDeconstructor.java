@@ -7,4 +7,12 @@ package com.yahoo.container.di;
  */
 public interface ComponentDeconstructor {
     void deconstruct(Object component);
+
+    /**
+     * Adds a task to uninstall the oldest set of obsolete bundles. This method should be called right
+     * after the obsolete components of this set of bundles have been deconstructed.
+     * The deconstructor only handles the timing of uninstalling, not which bundles to uninstall,
+     * and hence does not take the bundles as argument.
+     */
+    void uninstallBundles();
 }

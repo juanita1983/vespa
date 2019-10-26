@@ -109,8 +109,12 @@ public class HandlersConfigurerTestWrapper {
                     AbstractComponent abstractComponent = (AbstractComponent) component;
                     if (abstractComponent.isDeconstructable())
                         ((AbstractComponent) component).deconstruct();
+                }
             }
-        }};
+
+            @Override
+            public void uninstallBundles() { }
+        };
     }
 
     public void reloadConfig() {

@@ -292,6 +292,9 @@ public class ContainerTest extends ContainerTestBase {
                     ((Provider<?>) component).deconstruct();
                 }
             }
+
+            @Override
+            public void uninstallBundles() { }
         };
 
         Container container = newContainer(dirConfigSource, deconstructor);
@@ -382,6 +385,9 @@ public class ContainerTest extends ContainerTestBase {
                 vespaComponent.deconstruct();
             }
         }
+
+        @Override
+        public void uninstallBundles() { }
     }
 
     private static Container newContainer(DirConfigSource dirConfigSource,
